@@ -16,7 +16,7 @@
           <table class="augmented-table">
             <tbody>
     `;
-
+        git;
         for (let r = 0; r < m; r++) {
             html += "<tr>";
             for (let c = 0; c < n; c++) {
@@ -501,8 +501,10 @@
             if (res.status === "infinite") {
                 const noticeBox = document.createElement("div");
                 noticeBox.className = "spl-infinite-notice";
-                noticeBox.style.cssText = "grid-column: 1 / -1; margin-top: 0.5rem; font-size: 0.85rem; color: #b45309; background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; padding: 0.5rem 0.75rem;";
-                noticeBox.innerHTML = "<strong>Catatan:</strong> Sistem memiliki tak hingga banyak solusi (terdapat variabel bebas). Nilai di atas adalah salah satu solusi partikular dengan parameter bebas = 0.";
+                noticeBox.style.cssText =
+                    "grid-column: 1 / -1; margin-top: 0.5rem; font-size: 0.85rem; color: #b45309; background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; padding: 0.5rem 0.75rem;";
+                noticeBox.innerHTML =
+                    "<strong>Catatan:</strong> Sistem memiliki tak hingga banyak solusi (terdapat variabel bebas). Nilai di atas adalah salah satu solusi partikular dengan parameter bebas = 0.";
                 solutionValuesDiv.appendChild(noticeBox);
             }
 
