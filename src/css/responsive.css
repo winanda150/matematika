@@ -1,0 +1,418 @@
+/* =========================================================
+   RESPONSIVE.CSS - Sistem Responsif Penuh (320px s/d 1200px+)
+   ========================================================= */
+
+/* 1. LAYAR LEBAR / DESKTOP BESAR (>= 1200px) */
+@media (min-width: 1200px) {
+  :root {
+    --container-max-w: 920px;
+    --card-padding: 2.25rem;
+  }
+
+  .card {
+    border-radius: 20px;
+    box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.07), 0 0 0 1px rgba(226, 232, 240, 0.85);
+  }
+
+  #section-calc {
+    max-width: 450px;
+  }
+
+  .calc-btn {
+    height: 56px;
+    font-size: 1.25rem;
+    gap: 0.65rem;
+  }
+}
+
+/* 2. DESKTOP STANDAR & LAPTOP (769px - 1199px) */
+@media (min-width: 769px) {
+  .ai-story-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+
+  .quota-options-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .control-row {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+/* 3. TABLET & PHABLET (<= 768px) */
+@media (max-width: 768px) {
+  body {
+    padding: 1.5rem 1rem;
+  }
+
+  .container {
+    gap: 1.1rem;
+  }
+
+  .card {
+    padding: 1.4rem 1.25rem;
+    border-radius: 14px;
+  }
+
+  :root {
+    --matrix-cell-w: 58px;
+    --matrix-cell-h: 46px;
+    --matrix-gap: 0.65rem;
+    --matrix-div-margin: 0.4rem;
+  }
+
+  .main-nav {
+    padding: 0.3rem;
+  }
+
+  .nav-tab {
+    padding: 0.65rem 0.85rem;
+    font-size: 0.88rem;
+  }
+
+  .calc-btn {
+    height: 50px;
+    font-size: 1.18rem;
+  }
+}
+
+/* 4. MOBILE SEDANG / LANDSCAPE (<= 600px) */
+@media (max-width: 600px) {
+  .control-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.45rem;
+  }
+
+  .pill-group {
+    width: 100%;
+    gap: 0.35rem;
+  }
+
+  .option-pill {
+    flex: 1 1 auto;
+    text-align: center;
+    padding: 0.4rem 0.65rem;
+    font-size: 0.82rem;
+  }
+
+  .ai-story-grid {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+  }
+
+  .quota-options-grid {
+    grid-template-columns: 1fr;
+    gap: 0.65rem;
+  }
+
+  .story-action-row {
+    justify-content: stretch;
+  }
+
+  .story-action-row button,
+  #btn-parse-story {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .back-sub-line {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  .back-sub-step-label {
+    min-width: unset;
+    font-size: 0.82rem;
+    color: #1e40af;
+  }
+
+  .back-sub-math-expr {
+    font-size: 0.9rem;
+    word-break: break-word;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  .obe-step-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.45rem;
+  }
+
+  .back-sub-step-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+  }
+}
+
+/* 5. MOBILE STANDAR (<= 480px) */
+@media (max-width: 480px) {
+  body {
+    padding: 1rem 0.55rem;
+  }
+
+  .container {
+    gap: 0.95rem;
+  }
+
+  .card {
+    padding: 1.15rem 0.85rem;
+    border-radius: 12px;
+  }
+
+  .badge-tag {
+    font-size: 0.72rem;
+    padding: 0.22rem 0.7rem;
+  }
+
+  .main-nav {
+    padding: 0.25rem;
+    gap: 0.25rem;
+  }
+
+  .nav-tab {
+    padding: 0.6rem 0.5rem;
+    font-size: 0.82rem;
+    gap: 0.35rem;
+  }
+
+  :root {
+    --matrix-cell-w: 48px;
+    --matrix-cell-h: 42px;
+    --matrix-gap: 0.4rem;
+    --matrix-div-margin: 0.3rem;
+  }
+
+  .augmented-input-container {
+    padding: 1rem 0.5rem;
+  }
+
+  .augmented-cell-input {
+    font-size: 0.95rem;
+  }
+
+  .calculator-screen {
+    padding: 1rem 1rem;
+    min-height: 115px;
+    border-radius: 12px;
+  }
+
+  .calculator-keypad {
+    gap: 0.42rem;
+  }
+
+  .calc-btn {
+    height: 48px;
+    font-size: 1.12rem;
+    border-radius: 8px;
+  }
+
+  .spl-solution-card {
+    padding: 1.15rem 0.85rem;
+    border-radius: 12px;
+  }
+
+  .spl-solution-title {
+    font-size: 0.78rem;
+    margin-bottom: 0.65rem;
+  }
+
+  .spl-solution-values {
+    font-size: 1.35rem;
+    gap: 0.65rem;
+  }
+
+  .spl-var-item {
+    padding: 0.28rem 0.65rem;
+    font-size: 1.1rem;
+  }
+
+  .quota-limit-card {
+    padding: 1rem 0.85rem;
+    border-radius: 12px;
+  }
+
+  .quota-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+  }
+
+  .quota-retry-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .quota-footer-tip {
+    text-align: center;
+    width: 100%;
+    display: block;
+  }
+
+  .augmented-table td {
+    padding: 0.35rem 0.45rem;
+    min-width: 38px;
+    font-size: 0.9rem;
+  }
+
+  .file-preview-card {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding: 0.85rem;
+  }
+
+  .preview-thumb-wrap {
+    width: 62px;
+    height: 62px;
+  }
+
+  .preview-status-row {
+    gap: 0.35rem;
+  }
+
+  .upload-percent-badge {
+    font-size: 0.72rem;
+    padding: 0.1rem 0.42rem;
+  }
+
+  .preview-actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .preview-action-btn {
+    flex: 1;
+  }
+}
+
+/* 6. MOBILE PALING KECIL (<= 360px, e.g. 320px) */
+@media (max-width: 360px) {
+  body {
+    padding: 0.65rem 0.35rem;
+  }
+
+  .container {
+    gap: 0.8rem;
+  }
+
+  .card {
+    padding: 0.9rem 0.6rem;
+    border-radius: 10px;
+  }
+
+  .app-header {
+    margin-bottom: 0.15rem;
+  }
+
+  .badge-tag {
+    font-size: 0.68rem;
+    padding: 0.18rem 0.6rem;
+  }
+
+  .main-nav {
+    padding: 0.2rem;
+    gap: 0.2rem;
+  }
+
+  .nav-tab {
+    padding: 0.5rem 0.35rem;
+    font-size: 0.76rem;
+    letter-spacing: -0.01em;
+  }
+
+  .calculator-screen {
+    padding: 0.85rem 0.65rem;
+    min-height: 100px;
+    border-radius: 10px;
+  }
+
+  .calculator-keypad {
+    gap: 0.32rem;
+  }
+
+  .calc-btn {
+    height: 42px;
+    font-size: 1.02rem;
+    border-radius: 6px;
+  }
+
+  :root {
+    --matrix-cell-w: 40px;
+    --matrix-cell-h: 38px;
+    --matrix-gap: 0.26rem;
+    --matrix-div-margin: 0.2rem;
+  }
+
+  .augmented-input-container {
+    padding: 0.75rem 0.35rem;
+  }
+
+  .augmented-cell-input {
+    font-size: 0.88rem;
+    border-radius: 6px;
+  }
+
+  .augmented-table td {
+    padding: 0.28rem 0.32rem;
+    min-width: 32px;
+    font-size: 0.84rem;
+  }
+
+  .spl-solution-card {
+    padding: 0.95rem 0.65rem;
+    border-radius: 10px;
+  }
+
+  .spl-solution-title {
+    font-size: 0.72rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .spl-solution-values {
+    font-size: 1.15rem;
+    gap: 0.45rem;
+  }
+
+  .spl-var-item {
+    padding: 0.22rem 0.5rem;
+    font-size: 0.98rem;
+    border-radius: 6px;
+  }
+
+  .option-pill {
+    padding: 0.32rem 0.45rem;
+    font-size: 0.74rem;
+  }
+
+  .submit-btn {
+    font-size: 0.84rem;
+    padding: 0.75rem 0.85rem;
+    min-height: 44px;
+  }
+
+  .dropzone-label-trigger {
+    padding: 0.95rem 0.6rem;
+  }
+
+  .file-preview-card {
+    padding: 0.7rem;
+    gap: 0.6rem;
+  }
+
+  .preview-thumb-wrap {
+    width: 54px;
+    height: 54px;
+  }
+
+  .preview-file-name {
+    font-size: 0.78rem;
+  }
+}

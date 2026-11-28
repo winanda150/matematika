@@ -1,0 +1,663 @@
+/* =========================================================
+   SPL-OBE.CSS - Matriks Augmented, Solusi SPL, Langkah OBE & Substitusi Balik
+   ========================================================= */
+
+.spl-controls-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin-bottom: 1.25rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius-md);
+  padding: 1rem 1.15rem;
+}
+
+.control-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.control-label {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+/* Pill Group */
+.pill-group {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.option-pill {
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 700;
+  border: 1.5px solid #cbd5e1;
+  background: #ffffff;
+  color: var(--text-main);
+  padding: 0.4rem 0.85rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.option-pill.active {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
+}
+
+.story-tips-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-left: 4px solid var(--primary);
+  border-radius: var(--radius-md);
+  padding: 0.95rem 1.15rem;
+  margin-bottom: 1.25rem;
+  font-size: 0.88rem;
+  color: #334155;
+  line-height: 1.55;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.story-tips-header {
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin-bottom: 0.4rem;
+  color: #0f172a;
+}
+
+.story-tips-text {
+  margin: 0;
+  color: #475569;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+/* Bar Instruksi Matriks Augmented */
+.matrix-instruction-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 0.85rem;
+  padding: 0.1rem 0;
+}
+
+.matrix-instruction-title {
+  font-size: 0.94rem;
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: -0.01em;
+}
+
+.matrix-instruction-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+/* Grid Matriks Augmented Input */
+.augmented-input-container {
+  overflow-x: auto;
+  padding: 1.25rem 0.85rem;
+  background: #f8fafc;
+  border: 1.5px dashed var(--border-color);
+  border-radius: var(--radius-md);
+  margin-bottom: 1.25rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+#spl-grid-inputs {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--matrix-gap, 0.85rem);
+  width: max-content;
+  min-width: 100%;
+  margin: 0 auto;
+}
+
+.augmented-header-row {
+  display: flex;
+  align-items: center;
+  gap: var(--matrix-gap, 0.85rem);
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  text-align: center;
+  width: max-content;
+}
+
+.augmented-header-cell {
+  width: var(--matrix-cell-w, 64px);
+  text-align: center;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.augmented-input-row {
+  display: flex;
+  align-items: center;
+  gap: var(--matrix-gap, 0.85rem);
+  width: max-content;
+}
+
+.augmented-cell-input {
+  width: var(--matrix-cell-w, 64px);
+  height: var(--matrix-cell-h, 48px);
+  text-align: center;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 1.05rem;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--text-main);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+  flex-shrink: 0;
+}
+
+.augmented-cell-input:focus,
+.augmented-cell-input:focus-visible {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3.5px rgba(37, 99, 235, 0.22);
+  background: #ffffff;
+  position: relative;
+  z-index: 2;
+}
+
+.augmented-divider-bar {
+  width: 3px;
+  height: var(--matrix-cell-h, 48px);
+  background-color: #94a3b8;
+  border-radius: 2px;
+  margin: 0 var(--matrix-div-margin, 0.5rem);
+  flex-shrink: 0;
+}
+
+.augmented-divider-header {
+  width: 3px;
+  height: 20px;
+  background-color: transparent;
+  margin: 0 var(--matrix-div-margin, 0.5rem);
+  flex-shrink: 0;
+}
+
+/* Kotak Solusi SPL (Hasil Akhir) */
+.spl-solution-card {
+  background: linear-gradient(135deg, #065f46 0%, #047857 100%);
+  color: #ffffff;
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: 0 8px 24px -4px rgba(4, 120, 87, 0.35);
+  text-align: center;
+}
+
+.spl-solution-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.92);
+  display: block;
+  margin-bottom: 0.85rem;
+}
+
+.spl-solution-values {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  font-family: var(--font-mono);
+  font-size: 1.85rem;
+  font-weight: 800;
+  margin-bottom: 0;
+}
+
+.spl-var-item {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 0.35rem 0.85rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* Langkah-langkah Berurutan (OBE Steps) */
+.obe-steps-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.obe-step-card {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0.5rem 0 1.25rem 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.obe-step-card:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.obe-step-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.65rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.obe-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.obe-step-title {
+  font-size: 0.96rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 0;
+}
+
+.step-num-badge {
+  background: #0f172a;
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 0.22rem 0.68rem;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.obe-type-badge {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.2rem 0.65rem;
+  border-radius: 6px;
+}
+
+.obe-multi-badges {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.obe-formula-pill-sm {
+  display: inline-flex;
+  align-items: center;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1d4ed8;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.82rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+}
+
+.obe-step-desc {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+  line-height: 1.45;
+}
+
+/* Kotak Transformasi Operasi Baris (Daftar Operasi OBE) */
+.obe-transform-box {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 1.5px solid #cbd5e1;
+  border-left: 5px solid #2563eb;
+  border-radius: 10px;
+  padding: 0.95rem 1.15rem;
+  margin-bottom: 0.85rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.obe-transform-box.single-action-swap {
+  border-left-color: #b45309;
+}
+
+.obe-transform-box.single-action-norm {
+  border-left-color: #047857;
+}
+
+.obe-op-row {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+}
+
+/* Garis Panah Biru di Antara Rumus */
+.obe-long-arrow-connector {
+  display: flex;
+  align-items: center;
+  margin: 0.55rem 0;
+  width: 100%;
+  position: relative;
+}
+
+.arrow-shaft {
+  flex: 1;
+  height: 3px;
+  background: linear-gradient(90deg, #93c5fd 0%, #2563eb 80%, #1e40af 100%);
+  border-radius: 2px;
+}
+
+.arrow-head {
+  width: 0;
+  height: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 10px solid #1e40af;
+  margin-left: -1px;
+}
+
+.obe-op-formula {
+  display: inline-flex;
+  align-items: center;
+  background: #1e40af;
+  color: #ffffff;
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-size: 0.92rem;
+  padding: 0.32rem 0.8rem;
+  min-height: 34px;
+  border-radius: 6px;
+  letter-spacing: 0.02em;
+  box-shadow: 0 2px 4px rgba(30, 64, 175, 0.2);
+  white-space: nowrap;
+}
+
+/* Pecahan Vertikal Bertingkat di dalam Rumus OBE */
+.formula-frac {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  line-height: 1;
+  padding: 0 0.18rem;
+  margin: 0 0.2rem;
+  font-family: var(--font-mono);
+}
+
+.formula-frac-num {
+  font-size: 0.82em;
+  font-weight: 800;
+  line-height: 1.05;
+  padding-bottom: 1.5px;
+  text-align: center;
+}
+
+.formula-frac-bar {
+  width: 100%;
+  height: 1.5px;
+  background-color: currentColor;
+  border-radius: 1px;
+}
+
+.formula-frac-den {
+  font-size: 0.82em;
+  font-weight: 800;
+  line-height: 1.05;
+  padding-top: 1.5px;
+  text-align: center;
+}
+
+.obe-op-formula.formula-swap {
+  background: #b45309;
+  box-shadow: 0 2px 4px rgba(180, 83, 9, 0.2);
+}
+
+.obe-op-formula.formula-norm {
+  background: #047857;
+  box-shadow: 0 2px 4px rgba(4, 120, 87, 0.2);
+}
+
+.obe-op-explanation {
+  font-size: 0.88rem;
+  color: #334155;
+  font-weight: 600;
+}
+
+/* Wrapper Matriks Hasil di Bawah Operasi */
+.obe-matrix-wrapper-card {
+  background: transparent;
+  border: none;
+  padding: 0.5rem 0;
+}
+
+.obe-matrix-caption {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #64748b;
+  margin-bottom: 0.4rem;
+}
+
+/* Tabel Matriks Augmented di Langkah OBE */
+.augmented-table-wrapper {
+  overflow-x: auto;
+  padding: 0.5rem 0;
+  text-align: center;
+  -webkit-overflow-scrolling: touch;
+}
+
+.augmented-bracket-box {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  padding: 0.5rem 0.8rem;
+  margin: 0 auto;
+}
+
+.augmented-bracket-box::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 8px;
+  border-left: 3px solid currentColor;
+  border-top: 3px solid currentColor;
+  border-bottom: 3px solid currentColor;
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
+
+.augmented-bracket-box::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 8px;
+  border-right: 3px solid currentColor;
+  border-top: 3px solid currentColor;
+  border-bottom: 3px solid currentColor;
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+
+.augmented-table {
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+}
+
+.augmented-table td {
+  padding: 0.4rem 0.65rem;
+  text-align: center;
+  min-width: 44px;
+  font-weight: 700;
+}
+
+.augmented-table td.const-cell {
+  border-left: 2px solid #64748b;
+  padding-left: 0.85rem;
+  color: #2563eb;
+}
+
+/* Card Substitusi Balik Terstruktur */
+.back-sub-card {
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.back-sub-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #1e3a8a;
+  margin-bottom: 0.85rem;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.back-sub-steps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.back-sub-step-card {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0.5rem 0 1.25rem 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.back-sub-step-card:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.back-sub-step-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 0.6rem;
+  margin-bottom: 0.75rem;
+  border-bottom: 1px dashed #e2e8f0;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.back-sub-phase-group {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.back-sub-num-pill {
+  background: #0f172a;
+  color: #ffffff;
+  font-size: 0.76rem;
+  font-weight: 800;
+  padding: 0.2rem 0.65rem;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.back-sub-source-pill {
+  background: #eff6ff;
+  color: #1e40af;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid #bfdbfe;
+}
+
+.back-sub-var-pill {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #047857;
+}
+
+.back-sub-calc-flow {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.back-sub-line {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.back-sub-step-label {
+  min-width: 160px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.back-sub-math-expr {
+  font-family: var(--font-mono);
+  font-size: 0.94rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.back-sub-math-expr.highlight-math {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  padding: 0.25rem 0.65rem;
+  border-radius: 6px;
+  color: #15803d;
+}
+
+.back-sub-line.result-line {
+  margin-top: 0.35rem;
+  padding-top: 0.55rem;
+  border-top: 1px solid #f1f5f9;
+  align-items: center;
+}
+
+.back-sub-solution-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  color: #ffffff;
+  padding: 0.32rem 0.85rem;
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 1.05rem;
+  font-weight: 800;
+  box-shadow: 0 2px 4px rgba(4, 120, 87, 0.25);
+}

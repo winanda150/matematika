@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kalkulator Aljabar Linier (Gauss & Gauss-Jordan)</title>
+  <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
+
+  <!-- Modular Stylesheets -->
+  <link rel="stylesheet" href="src/css/variables.css">
+  <link rel="stylesheet" href="src/css/base.css">
+  <link rel="stylesheet" href="src/css/components.css">
+  <link rel="stylesheet" href="src/css/calculator.css">
+  <link rel="stylesheet" href="src/css/spl-obe.css">
+  <link rel="stylesheet" href="src/css/ai-modeler.css">
+  <link rel="stylesheet" href="src/css/responsive.css">
+
+  <!-- GSAP 3 Animation Engine -->
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js" defer></script>
+
+  <!-- Modular Scripts (Berurutan dengan defer, kompatibel lokal & GitHub Pages) -->
+  <script src="src/js/core/fraction.js" defer></script>
+  <script src="src/js/modules/quick-calculator.js" defer></script>
+  <script src="src/js/modules/spl-solver.js" defer></script>
+  <script src="src/js/modules/upload-animator.js" defer></script>
+  <script src="src/js/modules/ai-story-modeler.js" defer></script>
+  <script src="src/js/main.js" defer></script>
+</head>
+
+<body>
+  <div class="container">
+
+    <!-- Header -->
+    <header class="app-header">
+      <span class="badge-tag">Aljabar Linier</span>
+      <h1 class="app-title">Kalkulator Aljabar Linier</h1>
+      <p class="app-subtitle">
+        Platform komputasi aljabar linier praktis: kalkulator aritmatika & aljabar instan serta penyelesaian
+        Sistem Persamaan Linear (SPL) via Operasi Baris Elementer (OBE).
+      </p>
+    </header>
+
+    <!-- Navigasi Menu Tab Utama -->
+    <nav class="main-nav" role="tablist" aria-label="Menu Utama">
+      <button type="button" id="tab-btn-calc" class="nav-tab active" role="tab" aria-selected="true"
+        aria-controls="section-calc">
+        Kalkulator Cepat
+      </button>
+      <button type="button" id="tab-btn-gauss" class="nav-tab" role="tab" aria-selected="false"
+        aria-controls="section-gauss">
+        Sistem Persamaan Linear
+      </button>
+    </nav>
+
+    <!-- =========================================================
+         TAB 0: KALKULATOR CEPAT (ARITMATIKA UMUM & ALJABAR)
+         ========================================================= -->
+    <section id="section-calc" class="card" role="tabpanel" aria-labelledby="tab-btn-calc">
+      <!-- Area Layar Kalkulator Modern (Screen Display) -->
+      <div class="calculator-screen" id="calculator-screen" title="Klik di area layar untuk mulai mengetik">
+        <!-- Input Ekspresi (Tanpa Kotak/Border, Teks Rata Kanan di Atas) -->
+        <label for="quick-calc-input" class="sr-only">Input Ekspresi Kalkulator Cepat</label>
+        <input type="text" id="quick-calc-input" name="quick_calc_input" class="quick-calc-input" placeholder="0"
+          autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" enterkeyhint="done" value=""
+          aria-label="Input Ekspresi Kalkulator Cepat">
+
+        <!-- Hasil Langsung Evaluasi (Rata Kanan Tepat di Bawah Input) -->
+        <div class="calc-screen-result-area">
+          <div id="quick-calc-primary-val" class="calc-primary-val" title="Klik angka untuk menyalin">0</div>
+          <div id="quick-calc-frac-wrap" class="calc-frac-wrap hidden">
+            <span class="calc-frac-label">Pecahan:</span>
+            <div id="quick-calc-frac-display" class="calc-frac-display"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pesan Error / Petunjuk Live -->
+      <div id="quick-calc-error" class="error-box hidden" role="alert"></div>
+
+      <!-- Papan Tombol Fisik / Keypad (seperti kalkulator pada umumnya) -->
+      <div class="calculator-keypad-wrapper">
+        <div class="calculator-keypad" role="group" aria-label="Papan Tombol Kalkulator">
+          <!-- Baris 1: Kontrol & Kurung -->
+          <button type="button" class="calc-btn btn-clear" data-action="clear"
+            title="All Clear / Bersihkan Semua (Esc)">AC</button>
+          <button type="button" class="calc-btn btn-paren" data-insert="(" title="Buka Kurung">(</button>
+          <button type="button" class="calc-btn btn-paren" data-insert=")" title="Tutup Kurung">)</button>
+          <button type="button" class="calc-btn btn-backspace" data-action="backspace"
+            title="Hapus Karakter Terakhir (Backspace)">⌫</button>
+
+          <!-- Baris 2 -->
+          <button type="button" class="calc-btn btn-num" data-insert="7">7</button>
+          <button type="button" class="calc-btn btn-num" data-insert="8">8</button>
+          <button type="button" class="calc-btn btn-num" data-insert="9">9</button>
+          <button type="button" class="calc-btn btn-op" data-insert="/" title="Bagi (÷)">÷</button>
+
+          <!-- Baris 3 -->
+          <button type="button" class="calc-btn btn-num" data-insert="4">4</button>
+          <button type="button" class="calc-btn btn-num" data-insert="5">5</button>
+          <button type="button" class="calc-btn btn-num" data-insert="6">6</button>
+          <button type="button" class="calc-btn btn-op" data-insert="x" title="Kali (×)">×</button>
+
+          <!-- Baris 4 -->
+          <button type="button" class="calc-btn btn-num" data-insert="1">1</button>
+          <button type="button" class="calc-btn btn-num" data-insert="2">2</button>
+          <button type="button" class="calc-btn btn-num" data-insert="3">3</button>
+          <button type="button" class="calc-btn btn-op" data-insert="-" title="Kurang (−)">−</button>
+
+          <!-- Baris 5 -->
+          <button type="button" class="calc-btn btn-func" data-insert="%" title="Persen (%)">%</button>
+          <button type="button" class="calc-btn btn-num" data-insert="0">0</button>
+          <button type="button" class="calc-btn btn-num" data-insert="," title="Koma Desimal (,)">,</button>
+          <button type="button" class="calc-btn btn-op" data-insert="+" title="Tambah (+)">+</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         TAB 2: ELIMINASI GAUSS & GAUSS-JORDAN (SPL)
+         ========================================================= -->
+    <section id="section-gauss" class="card hidden" role="tabpanel" aria-labelledby="tab-btn-gauss">
+      <form id="spl-form">
+
+        <!-- Controls: Pilihan Metode & Ukuran SPL -->
+        <div class="spl-controls-bar">
+
+          <!-- Baris 1: Pilihan Metode -->
+          <div class="control-row">
+            <span class="control-label">Metode Penyelesaian:</span>
+            <div class="pill-group" role="radiogroup" aria-label="Metode SPL">
+              <button type="button" id="btn-story-app" class="option-pill"
+                title="Panduan dan pemodelan studi kasus soal cerita">
+                Soal Cerita
+              </button>
+              <button type="button" class="option-pill spl-method-pill active" data-method="gauss">
+                Eliminasi Gauss
+              </button>
+              <button type="button" class="option-pill spl-method-pill" data-method="gauss_jordan">
+                Eliminasi Gauss-Jordan
+              </button>
+            </div>
+          </div>
+
+          <!-- Baris 2: Jumlah Persamaan / Variabel -->
+          <div class="control-row">
+            <span class="control-label">Jumlah Persamaan:</span>
+            <div class="pill-group" role="radiogroup" aria-label="Ukuran SPL">
+              <button type="button" class="option-pill spl-size-pill" data-dim="2">2 Variabel</button>
+              <button type="button" class="option-pill spl-size-pill active" data-dim="3">3 Variabel</button>
+              <button type="button" class="option-pill spl-size-pill" data-dim="4">4 Variabel</button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Panel Soal Cerita (Upload Soal & Ekstraksi Matriks AI) -->
+        <div id="story-problem-panel" class="story-problem-panel hidden">
+          <div class="story-panel-header">
+            <div class="story-panel-badge-row">
+              <span class="ai-feature-tag">AI Matrix Modeler</span>
+              <div class="story-api-status-badge" id="api-status-badge"
+                title="API Key Google AI Studio kalkulator-aljabar aktif">
+                <span class="api-status-dot"></span>
+                <span id="api-status-text" class="api-status-text">Gemini AI Terhubung</span>
+              </div>
+            </div>
+            <h3 class="story-panel-title">Analisis & Ekstraksi Soal Cerita</h3>
+            <p class="story-panel-subtitle">
+              Unggah foto soal atau ketik teks cerita di bawah ini. Model AI akan mengekstrak variabel, merumuskan
+              persamaan, dan menyusun matriks <code>[ A | k ]</code> otomatis untuk diselesaikan dengan Eliminasi Gauss
+              / Gauss-Jordan.
+            </p>
+          </div>
+
+          <!-- Input Teks Soal Cerita -->
+          <div class="form-group" style="margin-bottom: 0.85rem;">
+            <span class="form-label" style="font-size: 0.85rem;">
+              Teks Soal Cerita:
+            </span>
+            <textarea id="story-text-input" name="story_text_input" class="story-textarea" rows="3"
+              placeholder="Ketik atau tempelkan teks soal cerita di sini... (Contoh: Sebuah toko roti memproduksi 3 jenis kue menggunakan tepung, gula, dan telur...)"
+              aria-label="Teks Soal Cerita"></textarea>
+          </div>
+
+          <!-- Dropzone Unggah Gambar / Foto Soal -->
+          <div class="story-upload-section">
+            <span class="form-label" style="font-size: 0.85rem;">
+              Atau Unggah Foto / Tangkapan Layar Soal:
+            </span>
+            <div id="story-dropzone" class="file-dropzone">
+              <input type="file" id="story-file-input" name="story_file_input" accept="image/*,.pdf" class="sr-only"
+                aria-label="Unggah Foto atau Tangkapan Layar Soal">
+
+              <!-- State 1: Area Ajakan Klik / Seret File -->
+              <label for="story-file-input" id="dropzone-idle-label" class="dropzone-label-trigger">
+                <div class="dropzone-content" id="dropzone-idle-content">
+                  <div class="dropzone-icon-stage" aria-hidden="true">
+                    <svg class="dropzone-upload-svg" width="26" height="26" viewBox="0 0 24 24" fill="none"
+                      stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                      overflow="visible">
+                      <path class="svg-tray" d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <g class="svg-arrow">
+                        <polyline points="17 8 12 3 7 8" />
+                        <line x1="12" y1="3" x2="12" y2="15" />
+                      </g>
+                    </svg>
+                  </div>
+                  <div class="dropzone-text">
+                    <span class="dropzone-main-text">Klik untuk pilih gambar soal atau seret file ke sini</span>
+                    <span class="dropzone-sub-text">Mendukung format PNG, JPG, JPEG</span>
+                  </div>
+                </div>
+              </label>
+
+              <!-- State 2: Kartu Pratinjau Foto + Progress Upload Modern + Laser Scan -->
+              <div id="story-file-preview" class="file-preview-card hidden">
+                <div class="preview-shimmer" aria-hidden="true"></div>
+                <span id="upload-live-region" class="sr-only" role="status" aria-live="polite"></span>
+
+                <button type="button" id="preview-thumb-btn" class="preview-thumb-wrap"
+                  title="Klik untuk perbesar pratinjau gambar">
+                  <img id="preview-thumb-img" class="preview-thumb-img hidden" alt="Pratinjau foto soal">
+                  <span id="preview-pdf-badge" class="preview-pdf-badge hidden" aria-hidden="true">PDF</span>
+                  <span id="thumb-uploading-veil" class="thumb-uploading-veil hidden" aria-hidden="true"></span>
+                  <svg id="thumb-progress-ring" class="thumb-progress-ring hidden" viewBox="0 0 64 64"
+                    aria-hidden="true">
+                    <defs>
+                      <linearGradient id="thumbRingGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#38bdf8" />
+                        <stop offset="55%" stop-color="#2563eb" />
+                        <stop offset="100%" stop-color="#10b981" />
+                      </linearGradient>
+                    </defs>
+                    <circle class="thumb-ring-track" cx="32" cy="32" r="24" />
+                    <circle id="thumb-ring-fill" class="thumb-ring-fill" cx="32" cy="32" r="24" stroke="#2563eb" />
+                  </svg>
+                  <span id="preview-zoom-hint" class="preview-zoom-hint hidden" aria-hidden="true">Perbesar</span>
+                  <span id="preview-scan-beam" class="preview-scan-beam hidden" aria-hidden="true"></span>
+                </button>
+
+                <div class="preview-file-meta">
+                  <div class="preview-status-row">
+                    <span id="preview-status-pill" class="preview-status-pill">
+                      <svg id="preview-check-svg" class="preview-check-svg" width="13" height="13" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
+                        stroke-linejoin="round" aria-hidden="true">
+                        <polyline class="preview-check-path" points="20 6 9 17 4 12"></polyline>
+                      </svg>
+                      <span id="preview-status-dot" class="preview-status-dot hidden" aria-hidden="true"></span>
+                      <span id="preview-status-text">Siap Dianalisis</span>
+                    </span>
+                    <span id="upload-percent-badge" class="upload-percent-badge hidden" aria-hidden="true">0%</span>
+                  </div>
+                  <div id="story-file-name" class="preview-file-name"></div>
+                  <div id="story-file-size" class="preview-file-size"></div>
+
+                  <div id="upload-progress-panel" class="upload-progress-panel hidden">
+                    <div id="upload-progress-track-wrap" class="upload-progress-track-wrap">
+                      <progress id="upload-progress-bar" class="upload-progress-bar" max="100" value="0"
+                        aria-label="Progres unggahan berkas soal"></progress>
+                      <div class="upload-progress-fx-clip" aria-hidden="true">
+                        <div id="upload-progress-sheen" class="upload-progress-sheen"></div>
+                      </div>
+                      <span id="upload-progress-tip" class="upload-progress-tip" aria-hidden="true"></span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="preview-actions">
+                  <label for="story-file-input" class="preview-action-btn preview-replace-btn"
+                    title="Ganti dengan gambar lain">
+                    Ganti
+                  </label>
+                  <button type="button" id="remove-file-btn" class="preview-action-btn preview-remove-btn"
+                    title="Hapus file terunggah">
+                    Hapus
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tombol Aksi Ekstraksi Matriks -->
+          <div class="story-action-row">
+            <button type="button" id="btn-parse-story" class="submit-btn"
+              style="background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%); margin: 0; padding: 0.65rem 1.25rem; font-size: 0.92rem;">
+              Ekstraksi Matriks & Selesaikan OBE
+            </button>
+          </div>
+
+          <!-- Banner Notifikasi Kuota Limit Gemini AI (Modern, Clean & Profesional) -->
+          <div id="story-quota-card" class="quota-limit-card hidden">
+            <div class="quota-card-header">
+              <div class="quota-badge-pill">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="8" x2="12" y2="12"></line>
+                  <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <span>Batas Kuota Pemanggilan AI</span>
+              </div>
+              <span class="quota-status-tag">Status 429 • Antrean Penuh</span>
+            </div>
+
+            <h4 class="quota-card-title">Layanan Ekstraksi AI Sedang Mencapai Batas Frekuensi Sementara</h4>
+
+            <p class="quota-card-lead">
+              Server Google Gemini AI menerapkan batas kuota per menit dan harian untuk akun gratis. Saat ini antrean
+              permintaan sedang penuh, namun Anda tetap dapat menyelesaikan soal tanpa kendala melalui opsi berikut:
+            </p>
+
+            <div class="quota-options-grid">
+              <div class="quota-opt-item">
+                <div class="quota-opt-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                </div>
+                <div class="quota-opt-text">
+                  <span class="quota-opt-title">Tunggu 60 Detik (Reset Otomatis)</span>
+                  <span class="quota-opt-desc">Batas per menit (15 RPM) akan otomatis di-reset oleh Google setiap 1
+                    menit. Anda dapat mencoba menekan tombol di bawah setelahnya.</span>
+                </div>
+              </div>
+
+              <div class="quota-opt-item">
+                <div class="quota-opt-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="3" y1="9" x2="21" y2="9"></line>
+                    <line x1="9" y1="21" x2="9" y2="9"></line>
+                  </svg>
+                </div>
+                <div class="quota-opt-text">
+                  <span class="quota-opt-title">Input Koefisien Matriks Manual</span>
+                  <span class="quota-opt-desc">Kalkulator Operasi Baris Elementer (OBE) tetap berfungsi 100% tanpa
+                    internet. Anda bisa langsung memasukkan koefisien pada tabel matriks di bawah.</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="quota-action-bar">
+              <button type="button" id="quota-retry-btn" class="quota-retry-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="23 4 23 10 17 10"></polyline>
+                  <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                </svg>
+                Coba Analisis Ulang Sekarang
+              </button>
+              <span class="quota-footer-tip">OBE & Kalkulator Pecahan Eksak Tetap Berfungsi 100%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Kartu Hasil Analisis & Pemodelan AI Soal Cerita -->
+        <div id="ai-story-analysis-card" class="ai-story-card hidden">
+          <div class="ai-story-card-header">
+            <div class="ai-story-badge-row">
+              <span class="ai-badge-pill">Model Gemini AI</span>
+              <span id="ai-method-badge" class="ai-method-badge">Eliminasi Gauss-Jordan</span>
+            </div>
+            <h4 id="ai-story-title" class="ai-story-title">Hasil Pemodelan Sistem Persamaan Linear</h4>
+          </div>
+
+          <div class="ai-story-grid">
+            <div class="ai-story-col">
+              <span class="ai-section-label">Pemisalan Variabel:</span>
+              <ul id="ai-story-variables" class="ai-story-list"></ul>
+            </div>
+            <div class="ai-story-col">
+              <span class="ai-section-label">Model Persamaan Linear:</span>
+              <div id="ai-story-equations" class="ai-story-equations-box"></div>
+            </div>
+          </div>
+
+          <div class="ai-story-footer">
+            <span class="ai-section-label">Pertanyaan Soal:</span>
+            <p id="ai-story-explanation" class="ai-story-explanation-text"></p>
+          </div>
+        </div>
+
+        <!-- Section Input Matriks Manual (Hanya Tampil di Mode Manual Gauss / Gauss-Jordan) -->
+        <div id="spl-manual-input-section">
+          <!-- Panduan Pengisian Matriks Persamaan Linear (Hanya Tampil di Mode Manual Gauss / Gauss-Jordan) -->
+          <div id="spl-manual-tips" class="story-tips-box">
+            <div class="story-tips-header">
+              Panduan Pengisian Matriks Persamaan Linear:
+            </div>
+            <div class="story-tips-text">
+              <div><strong>1. Koefisien Variabel (x₁, x₂, ...):</strong> Masukkan angka pengali di depan variabel. Jika
+                suatu variabel tidak muncul pada persamaan, isikan angka <strong>0</strong>.</div>
+              <div><strong>2. Baris Matriks:</strong> Setiap 1 baris horizontal mewakili 1 persamaan linear secara utuh.
+              </div>
+              <div><strong>3. Kolom Konstanta (k):</strong> Masukkan angka hasil di ruas kanan tanda sama dengan (=)
+                yang berdiri sendiri tanpa variabel.</div>
+            </div>
+          </div>
+
+          <!-- Bar Instruksi Matriks Augmented -->
+          <div class="matrix-instruction-bar">
+            <div class="matrix-instruction-title">Matriks Augmented [ A | k ]</div>
+            <div class="matrix-instruction-subtitle">
+              Isi koefisien setiap variabel (x₁, x₂, ...) dan nilai konstanta (k) pada tabel matriks di bawah ini:
+            </div>
+          </div>
+
+          <!-- Grid Input Matriks Augmented [ A | k ] -->
+          <div class="augmented-input-container">
+            <div id="spl-grid-inputs"></div>
+          </div>
+
+          <!-- Tombol Eksekusi Manual -->
+          <button type="submit" class="submit-btn">
+            Selesaikan Operasi Baris Elementer (OBE)
+          </button>
+        </div>
+      </form>
+
+      <!-- Alert Error SPL -->
+      <div id="spl-error-box" class="error-box hidden" role="alert" aria-live="polite"></div>
+
+      <!-- Area Hasil SPL -->
+      <div id="spl-result-area" class="result-area hidden" aria-live="polite">
+
+        <!-- 1. KOTAK HASIL AKHIR UTAMA -->
+        <div class="spl-solution-card">
+          <span class="spl-solution-title">Hasil Akhir Sistem Persamaan Linier</span>
+          <div id="spl-solution-values" class="spl-solution-values"></div>
+        </div>
+
+        <!-- 2. RANGKAIAN LANGKAH OPERASI BARIS ELEMENTER (OBE) -->
+        <div>
+          <h2 style="font-size: 1.05rem; font-weight: 800; color: #1e3a8a; margin-bottom: 0.75rem;">
+            Langkah Penyelesaian Operasi Baris Elementer (OBE) Berurutan:
+          </h2>
+          <div id="obe-steps-list" class="obe-steps-container"></div>
+        </div>
+
+        <!-- 3. TAHAP SUBSTITUSI BALIK (KHUSUS ELIMINASI GAUSS) -->
+        <div id="back-sub-section" class="back-sub-card hidden">
+          <h2 id="back-sub-title" class="back-sub-title">Tahap Substitusi Balik (Back-Substitution):</h2>
+          <div id="back-sub-steps-list" class="back-sub-steps-list"></div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>Kalkulator Aljabar Linier • Eliminasi Gauss, Gauss-Jordan & AI Matrix Modeler</p>
+    </footer>
+
+  </div>
+
+  <!-- Lightbox Pratinjau Foto Soal (Native Top-Layer Modal) -->
+  <dialog id="image-preview-dialog" class="image-preview-dialog" closedby="any"
+    aria-labelledby="image-preview-dialog-title">
+    <div class="image-dialog-panel">
+      <div class="image-dialog-header">
+        <h1 id="image-preview-dialog-title" class="image-dialog-title">Pratinjau Foto Soal</h1>
+        <form method="dialog">
+          <button type="submit" id="image-dialog-close-btn" class="image-dialog-close-btn" autofocus
+            aria-label="Tutup pratinjau">&times;</button>
+        </form>
+      </div>
+      <div class="image-dialog-body">
+        <img id="image-dialog-full-img" class="image-dialog-full-img" alt="Tampilan penuh foto soal cerita">
+      </div>
+    </div>
+  </dialog>
+</body>
+
+</html>

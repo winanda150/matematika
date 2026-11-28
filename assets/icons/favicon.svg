@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <rect width="64" height="64" rx="16" fill="#1E40AF" />
+  <rect x="4" y="4" width="56" height="56" rx="13" fill="url(#bgGrad)" />
+  <!-- Kurung siku kiri matriks -->
+  <path d="M21 16H15V48H21" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
+  <!-- Kurung siku kanan matriks -->
+  <path d="M43 16H49V48H43" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
+  <!-- Garis pemisah augmented -->
+  <line x1="36" y1="19" x2="36" y2="45" stroke="#93C5FD" stroke-width="2.5" stroke-linecap="round" />
+  <!-- Elemen matriks diagonal utama (1, 1) -->
+  <circle cx="24" cy="24" r="3" fill="#FFFFFF" />
+  <circle cx="30" cy="32" r="3" fill="#FFFFFF" />
+  <circle cx="24" cy="40" r="2.2" fill="#93C5FD" />
+  <!-- Elemen konstanta k -->
+  <circle cx="42" cy="24" r="2.6" fill="#34D399" />
+  <circle cx="42" cy="32" r="2.6" fill="#34D399" />
+  <circle cx="42" cy="40" r="2.6" fill="#34D399" />
+  <defs>
+    <linearGradient id="bgGrad" x1="4" y1="4" x2="60" y2="60" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2563EB" />
+      <stop offset="1" stop-color="#1E3A8A" />
+    </linearGradient>
+  </defs>
+</svg>

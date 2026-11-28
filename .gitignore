@@ -1,0 +1,10 @@
+# Sistem Operasi & Editor
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+
+# Dependensi & Lingkungan Lokal
+node_modules/
+.env
+.env.local

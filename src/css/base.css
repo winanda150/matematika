@@ -1,0 +1,77 @@
+/* =========================================================
+   BASE.CSS - Reset, Latar Halaman, Utilitas & Scrollbar
+   ========================================================= */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--bg-page);
+  background-image:
+    radial-gradient(at 10% 10%, rgba(37, 99, 235, 0.035) 0px, transparent 50%),
+    radial-gradient(at 90% 90%, rgba(16, 185, 129, 0.035) 0px, transparent 50%);
+  background-attachment: fixed;
+  color: var(--text-main);
+  line-height: 1.5;
+  padding: 2.25rem 1.25rem;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.container {
+  max-width: var(--container-max-w, 860px);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  width: 100%;
+}
+
+/* Utilities */
+.hidden {
+  display: none !important;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Custom Scrollbar Ramping untuk Container Tabel & Matriks */
+.augmented-input-container::-webkit-scrollbar,
+.augmented-table-wrapper::-webkit-scrollbar,
+.obe-steps-container::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+
+.augmented-input-container::-webkit-scrollbar-track,
+.augmented-table-wrapper::-webkit-scrollbar-track,
+.obe-steps-container::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 9999px;
+}
+
+.augmented-input-container::-webkit-scrollbar-thumb,
+.augmented-table-wrapper::-webkit-scrollbar-thumb,
+.obe-steps-container::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+
+.augmented-input-container::-webkit-scrollbar-thumb:hover,
+.augmented-table-wrapper::-webkit-scrollbar-thumb:hover,
+.obe-steps-container::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}

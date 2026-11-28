@@ -1,0 +1,206 @@
+/* =========================================================
+   CALCULATOR.CSS - Styling Tab Kalkulator Cepat & Keypad
+   ========================================================= */
+
+#section-calc {
+  max-width: 440px;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 1.25rem;
+}
+
+/* Layar Kalkulator Modern (Screen Display) */
+.calculator-screen {
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 1.5px solid #cbd5e1;
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.35rem;
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-end;
+  min-height: 130px;
+  cursor: text;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+  position: relative;
+  width: 100%;
+}
+
+.calculator-screen:hover {
+  border-color: #94a3b8;
+}
+
+.calculator-screen:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3.5px rgba(37, 99, 235, 0.18);
+}
+
+/* Input Ekspresi (Borderless, Teks Utama Besar & Tebal, Rata Kanan) */
+.quick-calc-input {
+  width: 100%;
+  font-family: var(--font-mono);
+  font-size: clamp(1.65rem, 5.5vw, 2.35rem);
+  font-weight: 800;
+  text-align: right;
+  border: none !important;
+  background: transparent !important;
+  outline: none !important;
+  box-shadow: none !important;
+  color: #0f172a;
+  padding: 0;
+  margin: 0 0 0.25rem 0;
+  min-height: auto;
+  line-height: 1.25;
+  letter-spacing: 0.01em;
+  caret-color: var(--primary);
+}
+
+.quick-calc-input::placeholder {
+  color: #cbd5e1;
+  text-align: right;
+}
+
+/* Area Hasil Tepat di Bawah Input */
+.calc-screen-result-area {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  width: 100%;
+}
+
+.calc-primary-val {
+  font-family: var(--font-mono);
+  font-size: clamp(1.1rem, 3.5vw, 1.35rem);
+  font-weight: 600;
+  color: #64748b;
+  text-align: right;
+  line-height: 1.3;
+  margin: 0;
+  padding: 0;
+  word-break: break-all;
+  user-select: all;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.calc-primary-val:hover {
+  color: var(--primary);
+}
+
+.calc-frac-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  padding: 0.3rem 0.75rem;
+  border-radius: 8px;
+}
+
+.calc-frac-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #2563eb;
+}
+
+.calc-frac-display {
+  color: #1e40af;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.calc-frac-display .inline-stacked-frac {
+  color: #1e40af;
+}
+
+.calc-frac-display .inline-frac-bar {
+  background-color: #1e40af;
+}
+
+/* Keypad Kalkulator */
+.calculator-keypad-wrapper {
+  margin-top: 1rem;
+  width: 100%;
+}
+
+.calculator-keypad {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.55rem;
+}
+
+.calc-btn {
+  font-family: var(--font-mono);
+  font-size: 1.2rem;
+  font-weight: 700;
+  height: 52px;
+  border-radius: var(--radius-sm);
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.15s ease, border-color 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  touch-action: manipulation;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.calc-btn:hover {
+  transform: translateY(-1.5px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.07);
+}
+
+.calc-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+/* Variasi Warna Tombol */
+.calc-btn.btn-num {
+  background: #ffffff;
+  color: #0f172a;
+}
+
+.calc-btn.btn-op {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: #1d4ed8;
+  font-size: 1.35rem;
+}
+
+.calc-btn.btn-op:hover {
+  background: #dbeafe;
+}
+
+.calc-btn.btn-paren,
+.calc-btn.btn-func {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #334155;
+}
+
+.calc-btn.btn-paren:hover,
+.calc-btn.btn-func:hover {
+  background: #f1f5f9;
+}
+
+.calc-btn.btn-clear,
+.calc-btn.btn-backspace {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #dc2626;
+  font-weight: 800;
+}
+
+.calc-btn.btn-clear:hover,
+.calc-btn.btn-backspace:hover {
+  background: #fee2e2;
+}

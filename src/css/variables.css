@@ -1,0 +1,30 @@
+/* =========================================================
+   VARIABLES.CSS - Design Tokens & Konfigurasi Global
+   ========================================================= */
+
+:root {
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+
+  --bg-page: #f8fafc;
+  --bg-card: #ffffff;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --border-color: #cbd5e1;
+
+  --radius-lg: 16px;
+  --radius-md: 10px;
+  --radius-sm: 6px;
+  --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* Ukuran Sel Matriks Augmented */
+  --matrix-cell-w: 64px;
+  --matrix-cell-h: 48px;
+  --matrix-gap: 0.85rem;
+  --matrix-div-margin: 0.5rem;
+
+  /* Kontainer & Responsivitas */
+  --container-max-w: 860px;
+  --card-padding: 1.75rem;
+}
