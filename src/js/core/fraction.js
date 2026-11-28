@@ -134,6 +134,7 @@
             const a = Math.floor(b);
             const h2 = a * h1 + h0;
             const k2 = a * k1 + k0;
+            if (k2 > maxDen && k1 > 0) break;
             h0 = h1;
             h1 = h2;
             k0 = k1;
@@ -149,19 +150,50 @@
     // Konversi aman angka atau string pecahan (misal "1/2", 0.5, 3) ke objek Frac
     function toFracSafe(v) {
         if (v instanceof Frac) return new Frac(v.n, v.d);
-        if (typeof v === "string" && v.includes("/")) {
-            const parts = v.split("/");
-            const top = parseFloat(parts[0]);
-            const bot = parseFloat(parts[1]);
-            if (parts.length === 2 && !isNaN(top) && !isNaN(bot) && bot !== 0) {
-                const fTop = floatToFrac(top);
-                const fBot = floatToFrac(bot);
-                if (fTop && fBot && !fBot.isZero()) return fTop.div(fBot);
+        const strictNumRe = /^[+-]?(?:\d+\.?\d*|\.\d+)$/;
+        if (typeof v === "string") {
+            const trimmed = v.trim();
+            if (trimmed.includes("/")) {
+                const parts = trimmed.split("/");
+                if (parts.length === 2) {
+                    const pTop = parts[0].trim();
+                    const pBot = parts[1].trim();
+                    if (strictNumRe.test(pTop) && strictNumRe.test(pBot)) {
+                        const bot = Number(pBot);
+                        if (bot !== 0) {
+                            const fTop = floatToFrac(Number(pTop));
+                            const fBot = floatToFrac(bot);
+                            if (fTop && fBot && !fBot.isZero()) return fTop.div(fBot);
+                        }
+                    }
+                }
             }
+            if (!trimmed || !strictNumRe.test(trimmed)) return new Frac(0, 1);
+            return floatToFrac(Number(trimmed)) || new Frac(0, 1);
         }
         const num = Number(v);
         if (isNaN(num)) return new Frac(0, 1);
         return floatToFrac(num) || new Frac(0, 1);
+    }
+
+    function escapeHtml(str) {
+        if (str === null || str === undefined) return "";
+        return String(str).replace(/[&<>"']/g, (ch) => {
+            switch (ch) {
+                case "&":
+                    return "&amp;";
+                case "<":
+                    return "&lt;";
+                case ">":
+                    return "&gt;";
+                case '"':
+                    return "&quot;";
+                case "'":
+                    return "&#39;";
+                default:
+                    return ch;
+            }
+        });
     }
 
     // Format angka dengan pemisah ribuan koma (contoh: 3000 -> 3,000, 10457.575 -> 10,457.575)
@@ -169,7 +201,18 @@
         if (num === null || num === undefined || isNaN(num) || !isFinite(num)) {
             return "0";
         }
-        let str = Number.isInteger(num) ? num.toString() : parseFloat(num.toFixed(8)).toString();
+        let str;
+        if (Number.isInteger(num)) {
+            str = num.toString();
+        } else if (Math.abs(num) > 0 && Math.abs(num) < 1e-8) {
+            str = parseFloat(num.toPrecision(8)).toString();
+        } else {
+            str = parseFloat(num.toFixed(8)).toString();
+        }
+
+        if (str.includes("e") || str.includes("E")) {
+            return str;
+        }
 
         const isNegative = str.startsWith("-");
         if (isNegative) str = str.slice(1);
@@ -190,6 +233,7 @@
         renderDivisionStackedHtml,
         floatToFrac,
         toFracSafe,
+        escapeHtml,
         formatNumberWithCommas
     };
 })(typeof window !== "undefined" ? window : globalThis);

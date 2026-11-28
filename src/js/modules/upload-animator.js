@@ -243,7 +243,7 @@
             if (fileNameEl) fileNameEl.textContent = fileName;
             if (fileSizeEl) fileSizeEl.textContent = `${sizeKbStr} KB • ${extLabel}`;
 
-            const isImage = Boolean(file.type && file.type.startsWith("image/"));
+            const isImage = Boolean((file.type && file.type.startsWith("image/")) || /\.(png|jpe?g|webp|gif|bmp)$/i.test(fileName));
             currentIsImage = isImage;
 
             if (isImage) {
@@ -819,13 +819,13 @@
                 g.fromTo(
                     analysisCard,
                     { opacity: 0, y: 14 },
-                    { opacity: 1, y: 0, duration: 0.38, ease: "power3.out", clearProps: "transform,opacity" }
+                    { opacity: 1, y: 0, duration: 0.38, ease: "power3.out", overwrite: "auto", clearProps: "transform,opacity" }
                 );
                 if (blocks.length) {
                     g.fromTo(
                         blocks,
                         { opacity: 0, y: 10 },
-                        { opacity: 1, y: 0, duration: 0.34, stagger: 0.06, ease: "power2.out", clearProps: "transform,opacity" }
+                        { opacity: 1, y: 0, duration: 0.34, stagger: 0.06, ease: "power2.out", overwrite: "auto", clearProps: "transform,opacity" }
                     );
                 }
             }
@@ -836,7 +836,7 @@
                     g.fromTo(
                         solCard,
                         { opacity: 0, scale: 0.97, y: 12 },
-                        { opacity: 1, scale: 1, y: 0, duration: 0.42, delay: 0.08, ease: "back.out(1.4)", clearProps: "transform,opacity" }
+                        { opacity: 1, scale: 1, y: 0, duration: 0.42, delay: 0.08, ease: "back.out(1.4)", overwrite: "auto", clearProps: "transform,opacity" }
                     );
                 }
             }
@@ -866,7 +866,7 @@
             });
 
             // Fallback light-dismiss bagi peramban yang belum mendukung atribut closedby="any"
-            if (!("closedBy" in HTMLDialogElement.prototype)) {
+            if (typeof HTMLDialogElement !== "undefined" && !("closedBy" in HTMLDialogElement.prototype)) {
                 const isOutside = (e) => {
                     const r = previewDialog.getBoundingClientRect();
                     return e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;

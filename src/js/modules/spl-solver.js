@@ -16,7 +16,6 @@
           <table class="augmented-table">
             <tbody>
     `;
-        git;
         for (let r = 0; r < m; r++) {
             html += "<tr>";
             for (let c = 0; c < n; c++) {
@@ -46,14 +45,21 @@
         return str.replace(
             /\(\s*([+-]?\d+)\s*\/\s*(\d+)\s*\)|(?<![bB]\d*)(?<=[+\-·*÷\s]|(?:\/\s*))([+-]?\d+)\/(\d+)(?![0-9/])/g,
             (match, n1, d1, n2, d2) => {
-                const n = n1 !== undefined ? n1 : n2;
-                const d = d1 !== undefined ? d1 : d2;
-                return `<span class="formula-frac"><span class="formula-frac-num">${n}</span><span class="formula-frac-bar" aria-hidden="true"></span><span class="formula-frac-den">${d}</span></span>`;
+                const hadParens = n1 !== undefined;
+                const rawN = hadParens ? n1 : n2;
+                const d = hadParens ? d1 : d2;
+                const isNeg = rawN.startsWith("-");
+                const absN = isNeg || rawN.startsWith("+") ? rawN.slice(1) : rawN;
+                const fracHtml = `${isNeg ? "−" : ""}<span class="formula-frac"><span class="formula-frac-num">${absN}</span><span class="formula-frac-bar" aria-hidden="true"></span><span class="formula-frac-den">${d}</span></span>`;
+                return hadParens && isNeg ? `(${fracHtml})` : fracHtml;
             }
         );
     }
 
     function solveSPL(matrixData, method = "gauss") {
+        if (!Array.isArray(matrixData) || matrixData.length === 0 || !Array.isArray(matrixData[0]) || matrixData[0].length < 2) {
+            throw new Error("Format matriks augmented tidak valid.");
+        }
         const { Frac, renderDivisionStackedHtml, toFracSafe } = App.Core;
         const m = matrixData.length;
         const n = matrixData[0].length - 1;
@@ -65,7 +71,7 @@
             title: "Matriks Augmented Awal [ A | k ]",
             operations: [],
             formula: "Sistem Persamaan Linier Awal",
-            desc: `Matriks disusun dari koefisien variabel x₁ sampai x_${n} dan kolom konstanta k:`,
+            desc: `Matriks disusun dari koefisien variabel x<sub>1</sub> sampai x<sub>${n}</sub> dan kolom konstanta k:`,
             mat: cloneFracMatrix(mat)
         });
 
@@ -228,9 +234,11 @@
                     stepNum: backSubCounter++,
                     rowName: "Variabel Bebas",
                     varIdx: c + 1,
+                    isFreeVar: true,
                     initialEqHtml: `Kolom x<sub>${c + 1}</sub> tidak memiliki satu utama (variabel bebas)`,
+                    freeVarLineHtml: `Dimisalkan nilai parameter bebas: x<sub>${c + 1}</sub> = 0 (atau parameter <em>t</em>)`,
                     substEqHtml: null,
-                    isolateLineHtml: `Dimisalkan nilai parameter bebas: x<sub>${c + 1}</sub> = 0 (atau parameter <em>t</em>)`,
+                    isolateLineHtml: null,
                     resultVal: solutions[c]
                 });
             }
@@ -391,7 +399,18 @@
                 }
             });
             inp.addEventListener("input", () => {
-                inp.value = inp.value.replace(/[^0-9.\-/]/g, "");
+                const orig = inp.value;
+                const normalized = orig.replace(/,/g, ".").replace(/[^0-9.\-/]/g, "");
+                if (orig !== normalized) {
+                    const curPos = inp.selectionStart;
+                    inp.value = normalized;
+                    if (curPos !== null) {
+                        const prefix = orig.slice(0, curPos);
+                        const cleanedPrefix = prefix.replace(/,/g, ".").replace(/[^0-9.\-/]/g, "");
+                        const nextPos = Math.min(cleanedPrefix.length, normalized.length);
+                        inp.setSelectionRange(nextPos, nextPos);
+                    }
+                }
             });
 
             return { lbl, inp };
@@ -616,49 +635,64 @@
               <span class="back-sub-var-pill">Mencari Nilai <strong>x<sub>${s.varIdx}</sub></strong></span>
             </div>
             <div class="back-sub-calc-flow">
-              <div class="back-sub-line">
-                <span class="back-sub-step-label">1. Persamaan Baris:</span>
-                <span class="back-sub-math-expr">${s.initialEqHtml}</span>
-              </div>
               ${
-                  s.substEqHtml
+                  s.isFreeVar
                       ? `
                 <div class="back-sub-line">
-                  <span class="back-sub-step-label">2. Masukkan Nilai:</span>
-                  <span class="back-sub-math-expr">${s.substEqHtml}</span>
+                  <span class="back-sub-step-label">1. Status Kolom:</span>
+                  <span class="back-sub-math-expr">${s.initialEqHtml}</span>
                 </div>
-              `
-                      : ""
-              }
-              ${
-                  s.simpLineHtml
-                      ? `
                 <div class="back-sub-line">
-                  <span class="back-sub-step-label">3. Sederhanakan Ruas:</span>
-                  <span class="back-sub-math-expr">${s.simpLineHtml}</span>
+                  <span class="back-sub-step-label">2. Parameter Bebas:</span>
+                  <span class="back-sub-math-expr">${s.freeVarLineHtml}</span>
                 </div>
               `
-                      : ""
-              }
-              ${
-                  s.isolateLineHtml
-                      ? `
+                      : `
                 <div class="back-sub-line">
-                  <span class="back-sub-step-label">4. Pindah Ruas:</span>
-                  <span class="back-sub-math-expr">${s.isolateLineHtml}</span>
+                  <span class="back-sub-step-label">1. Persamaan Baris:</span>
+                  <span class="back-sub-math-expr">${s.initialEqHtml}</span>
                 </div>
+                ${
+                    s.substEqHtml
+                        ? `
+                  <div class="back-sub-line">
+                    <span class="back-sub-step-label">2. Masukkan Nilai:</span>
+                    <span class="back-sub-math-expr">${s.substEqHtml}</span>
+                  </div>
+                `
+                        : ""
+                }
+                ${
+                    s.simpLineHtml
+                        ? `
+                  <div class="back-sub-line">
+                    <span class="back-sub-step-label">3. Sederhanakan Ruas:</span>
+                    <span class="back-sub-math-expr">${s.simpLineHtml}</span>
+                  </div>
+                `
+                        : ""
+                }
+                ${
+                    s.isolateLineHtml
+                        ? `
+                  <div class="back-sub-line">
+                    <span class="back-sub-step-label">4. Pindah Ruas:</span>
+                    <span class="back-sub-math-expr">${s.isolateLineHtml}</span>
+                  </div>
+                `
+                        : ""
+                }
+                ${
+                    s.solveLineHtml
+                        ? `
+                  <div class="back-sub-line">
+                    <span class="back-sub-step-label">${s.isolateLineHtml ? "5. Bagi Koefisien:" : "2. Hitung Variabel:"}</span>
+                    <span class="back-sub-math-expr highlight-math">${s.solveLineHtml}</span>
+                  </div>
+                `
+                        : ""
+                }
               `
-                      : ""
-              }
-              ${
-                  s.solveLineHtml
-                      ? `
-                <div class="back-sub-line">
-                  <span class="back-sub-step-label">${s.isolateLineHtml ? "5. Bagi Koefisien:" : "2. Hitung Variabel:"}</span>
-                  <span class="back-sub-math-expr highlight-math">${s.solveLineHtml}</span>
-                </div>
-              `
-                      : ""
               }
               <div class="back-sub-line result-line">
                 <span class="back-sub-step-label">Nilai Diperoleh:</span>
@@ -680,14 +714,21 @@
 
         splMethodPills.forEach((pill) => {
             pill.addEventListener("click", () => {
-                splMethodPills.forEach((p) => p.classList.remove("active"));
-                if (storyAppBtn) storyAppBtn.classList.remove("active");
+                if (pill.classList.contains("active")) return;
+                splMethodPills.forEach((p) => {
+                    const active = p === pill;
+                    p.classList.toggle("active", active);
+                    p.setAttribute("aria-checked", active ? "true" : "false");
+                });
+                if (storyAppBtn) {
+                    storyAppBtn.classList.remove("active");
+                    storyAppBtn.setAttribute("aria-checked", "false");
+                }
                 if (typeof options.onManualModeSelected === "function") {
                     options.onManualModeSelected();
                 }
                 if (splManualTips) splManualTips.classList.remove("hidden");
                 if (splManualInputSection) splManualInputSection.classList.remove("hidden");
-                pill.classList.add("active");
                 currentSplMethod = pill.dataset.method;
                 hideSplMessages();
             });
@@ -695,8 +736,33 @@
 
         splSizePills.forEach((pill) => {
             pill.addEventListener("click", () => {
-                splSizePills.forEach((p) => p.classList.remove("active"));
-                pill.classList.add("active");
+                const isStoryActive = Boolean(storyAppBtn && storyAppBtn.classList.contains("active"));
+                if (pill.classList.contains("active") && !isStoryActive) {
+                    return;
+                }
+                if (isStoryActive) {
+                    if (storyAppBtn) {
+                        storyAppBtn.classList.remove("active");
+                        storyAppBtn.setAttribute("aria-checked", "false");
+                    }
+                    if (typeof options.onManualModeSelected === "function") {
+                        options.onManualModeSelected();
+                    }
+                    if (splManualTips) splManualTips.classList.remove("hidden");
+                    if (splManualInputSection) splManualInputSection.classList.remove("hidden");
+                    const fallbackMethod = currentSplMethod === "gauss_jordan" ? "gauss_jordan" : "gauss";
+                    currentSplMethod = fallbackMethod;
+                    splMethodPills.forEach((p) => {
+                        const active = p.dataset.method === fallbackMethod;
+                        p.classList.toggle("active", active);
+                        p.setAttribute("aria-checked", active ? "true" : "false");
+                    });
+                }
+                splSizePills.forEach((p) => {
+                    const active = p === pill;
+                    p.classList.toggle("active", active);
+                    p.setAttribute("aria-checked", active ? "true" : "false");
+                });
                 const dim = parseInt(pill.dataset.dim, 10);
                 renderSplInputs(dim);
                 hideSplMessages();
@@ -704,10 +770,16 @@
         });
 
         if (splForm) {
+            const strictNumRe = /^[+-]?(?:\d+\.?\d*|\.\d+)$/;
+
             splForm.addEventListener("submit", (e) => {
                 e.preventDefault();
+                if (splManualInputSection && splManualInputSection.classList.contains("hidden")) {
+                    return;
+                }
                 hideSplMessages();
 
+                const { toFracSafe } = App.Core;
                 const dim = currentSplDim;
                 const matrixData = [];
                 const rows = splGridContainer.querySelectorAll(".augmented-input-row");
@@ -716,27 +788,31 @@
                     const rowInputs = rows[r].querySelectorAll(".augmented-cell-input");
                     const rowVals = [];
                     for (let c = 0; c <= dim; c++) {
-                        const rawCell = rowInputs[c].value.trim();
-                        let val;
+                        const rawCell = rowInputs[c].value.trim().replace(/,/g, ".");
+                        let parsedCell = null;
                         if (rawCell.includes("/")) {
                             const parts = rawCell.split("/");
-                            const top = parseFloat(parts[0]);
-                            const bot = parseFloat(parts[1]);
-                            val = parts.length === 2 && !isNaN(top) && !isNaN(bot) && bot !== 0 ? top / bot : NaN;
-                        } else {
-                            val = parseFloat(rawCell);
+                            if (parts.length === 2) {
+                                const topStr = parts[0].trim();
+                                const botStr = parts[1].trim();
+                                if (strictNumRe.test(topStr) && strictNumRe.test(botStr) && Number(botStr) !== 0) {
+                                    parsedCell = `${topStr}/${botStr}`;
+                                }
+                            }
+                        } else if (rawCell !== "" && strictNumRe.test(rawCell)) {
+                            parsedCell = Number(rawCell);
                         }
 
-                        if (isNaN(val)) {
+                        if (parsedCell === null || (typeof parsedCell === "number" && !isFinite(parsedCell))) {
                             showSplError(`Nilai pada Baris ${r + 1} Kolom ${c < dim ? "x" + (c + 1) : "k"} tidak valid.`);
                             return;
                         }
-                        rowVals.push(val);
+                        rowVals.push(parsedCell);
                     }
                     matrixData.push(rowVals);
                 }
 
-                const isAllZero = matrixData.every((row) => row.every((val) => val === 0));
+                const isAllZero = matrixData.every((row) => row.every((val) => toFracSafe(val).isZero()));
                 if (isAllZero) {
                     showSplError(`
             <div class="error-title">Matriks Belum Diisi</div>
@@ -745,7 +821,7 @@
                     return;
                 }
 
-                const isAllCoeffZero = matrixData.every((row) => row.slice(0, dim).every((val) => val === 0));
+                const isAllCoeffZero = matrixData.every((row) => row.slice(0, dim).every((val) => toFracSafe(val).isZero()));
                 if (isAllCoeffZero) {
                     showSplError(`
             <div class="error-title">Koefisien Variabel Tidak Valid</div>
@@ -767,11 +843,16 @@
             },
             setActiveSizePill: (dim) => {
                 splSizePills.forEach((p) => {
-                    p.classList.toggle("active", parseInt(p.dataset.dim, 10) === dim);
+                    const active = parseInt(p.dataset.dim, 10) === dim;
+                    p.classList.toggle("active", active);
+                    p.setAttribute("aria-checked", active ? "true" : "false");
                 });
             },
             clearMethodPills: () => {
-                splMethodPills.forEach((p) => p.classList.remove("active"));
+                splMethodPills.forEach((p) => {
+                    p.classList.remove("active");
+                    p.setAttribute("aria-checked", "false");
+                });
             },
             hideManualSections: () => {
                 if (splManualTips) splManualTips.classList.add("hidden");

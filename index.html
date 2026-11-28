@@ -129,14 +129,14 @@
           <div class="control-row">
             <span class="control-label">Metode Penyelesaian:</span>
             <div class="pill-group" role="radiogroup" aria-label="Metode SPL">
-              <button type="button" id="btn-story-app" class="option-pill"
+              <button type="button" id="btn-story-app" class="option-pill" role="radio" aria-checked="false"
                 title="Panduan dan pemodelan studi kasus soal cerita">
                 Soal Cerita
               </button>
-              <button type="button" class="option-pill spl-method-pill active" data-method="gauss">
+              <button type="button" class="option-pill spl-method-pill active" role="radio" aria-checked="true" data-method="gauss">
                 Eliminasi Gauss
               </button>
-              <button type="button" class="option-pill spl-method-pill" data-method="gauss_jordan">
+              <button type="button" class="option-pill spl-method-pill" role="radio" aria-checked="false" data-method="gauss_jordan">
                 Eliminasi Gauss-Jordan
               </button>
             </div>
@@ -146,9 +146,9 @@
           <div class="control-row">
             <span class="control-label">Jumlah Persamaan:</span>
             <div class="pill-group" role="radiogroup" aria-label="Ukuran SPL">
-              <button type="button" class="option-pill spl-size-pill" data-dim="2">2 Variabel</button>
-              <button type="button" class="option-pill spl-size-pill active" data-dim="3">3 Variabel</button>
-              <button type="button" class="option-pill spl-size-pill" data-dim="4">4 Variabel</button>
+              <button type="button" class="option-pill spl-size-pill" role="radio" aria-checked="false" data-dim="2">2 Variabel</button>
+              <button type="button" class="option-pill spl-size-pill active" role="radio" aria-checked="true" data-dim="3">3 Variabel</button>
+              <button type="button" class="option-pill spl-size-pill" role="radio" aria-checked="false" data-dim="4">4 Variabel</button>
             </div>
           </div>
 

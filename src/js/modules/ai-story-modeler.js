@@ -11,16 +11,59 @@
         ? atob("QVEuQWI4Uk42S3Bmdkk0VS1TcWhhZnVwS2NyVVNRRHhxYlZmMFFqbHRSWkdLWjFvVkFwc1E=")
         : "__GEMINI_API_KEY__";
 
-    function getProblemCacheKey(text, file) {
-        if (file) {
-            return "spl_cache_v3_img_" + encodeURIComponent(file.name + "_" + file.size);
+    function hashCacheStr(str) {
+        let h = 2166136261;
+        for (let i = 0; i < str.length; i++) {
+            h ^= str.charCodeAt(i);
+            h = Math.imul(h, 16777619);
         }
-        if (!text) return null;
-        const clean = text
-            .toLowerCase()
-            .replace(/[^a-z0-9]/g, "")
-            .slice(0, 80);
-        return "spl_cache_v3_txt_" + clean;
+        return (h >>> 0).toString(36);
+    }
+
+    function escapeSafeHtml(str) {
+        if (App.Core && typeof App.Core.escapeHtml === "function") {
+            return App.Core.escapeHtml(str);
+        }
+        if (str === null || str === undefined) return "";
+        return String(str).replace(/[&<>"']/g, (ch) => {
+            switch (ch) {
+                case "&":
+                    return "&amp;";
+                case "<":
+                    return "&lt;";
+                case ">":
+                    return "&gt;";
+                case '"':
+                    return "&quot;";
+                case "'":
+                    return "&#39;";
+                default:
+                    return ch;
+            }
+        });
+    }
+
+    function inferMimeType(file) {
+        if (file && file.type) return file.type;
+        const name = ((file && file.name) || "").toLowerCase();
+        if (name.endsWith(".png")) return "image/png";
+        if (name.endsWith(".webp")) return "image/webp";
+        if (name.endsWith(".gif")) return "image/gif";
+        if (name.endsWith(".bmp")) return "image/bmp";
+        if (name.endsWith(".pdf")) return "application/pdf";
+        return "image/jpeg";
+    }
+
+    function getProblemCacheKey(text, file) {
+        const cleanText = (text || "").toLowerCase().replace(/\s+/g, " ").trim();
+        const textSig = cleanText ? `${hashCacheStr(cleanText)}_${cleanText.length}` : "";
+        if (file) {
+            const fileSig = `${file.name || "file"}_${file.size || 0}_${file.lastModified || 0}`;
+            const combined = textSig ? `${fileSig}_t_${textSig}` : fileSig;
+            return "spl_cache_v4_img_" + encodeURIComponent(combined);
+        }
+        if (!cleanText) return null;
+        return "spl_cache_v4_txt_" + textSig;
     }
 
     function getCachedProblemAnalysis(key) {
@@ -64,7 +107,9 @@
 
     function normalizeAiMatrix(rawMatrix) {
         if (!Array.isArray(rawMatrix) || rawMatrix.length === 0) return null;
-        const dim = Math.min(4, Math.max(2, rawMatrix.length));
+        const maxCols = rawMatrix.reduce((acc, row) => Math.max(acc, Array.isArray(row) ? row.length : 0), 0);
+        const inferredVars = maxCols >= 2 ? maxCols - 1 : 2;
+        const dim = Math.min(4, Math.max(2, rawMatrix.length, inferredVars));
         const result = [];
         for (let r = 0; r < dim; r++) {
             const srcRow = Array.isArray(rawMatrix[r]) ? rawMatrix[r] : [];
@@ -135,15 +180,23 @@
         if (
             lower.includes("gauss-jordan") ||
             lower.includes("gauss jordan") ||
-            lower.includes("jordan") ||
             lower.includes("eselon baris tereduksi") ||
-            lower.includes("rref")
+            /\brref\b/.test(lower)
         ) {
             return "gauss_jordan";
         }
 
-        if (lower.includes("gauss") || lower.includes("eselon baris") || lower.includes("substitusi balik") || lower.includes("ref")) {
+        if (
+            /\bgauss\b/.test(lower) ||
+            lower.includes("eselon baris") ||
+            lower.includes("substitusi balik") ||
+            /\bref\b/.test(lower)
+        ) {
             return "gauss";
+        }
+
+        if (/\bjordan\b/.test(lower)) {
+            return "gauss_jordan";
         }
 
         return null;
@@ -162,7 +215,7 @@
                 const resultStr = typeof reader.result === "string" ? reader.result : "";
                 const commaIdx = resultStr.indexOf(",");
                 const base64 = commaIdx !== -1 ? resultStr.substring(commaIdx + 1) : resultStr;
-                const mimeType = file.type || "image/jpeg";
+                const mimeType = inferMimeType(file);
 
                 if (mimeType.startsWith("image/")) {
                     const probe = new Image();
@@ -220,9 +273,9 @@
         };
     }
 
-    async function analyzeStoryProblemWithGemini(userText, imageFile, knownMethod = null, preparedPayload = null) {
+    async function analyzeStoryProblemWithGemini(userText, imageFile, knownMethod = null, preparedPayload = null, externalSignal = null) {
         let imageBase64 = null;
-        let mimeType = "image/jpeg";
+        let mimeType = inferMimeType(imageFile);
 
         if (preparedPayload && preparedPayload.base64 && (!imageFile || preparedPayload.file === imageFile)) {
             imageBase64 = preparedPayload.base64;
@@ -295,11 +348,32 @@ Output WAJIB JSON murni:
         let lastError = null;
 
         for (const model of models) {
+            if (externalSignal && externalSignal.aborted) {
+                const abortErr = new Error("Analisis soal dibatalkan.");
+                abortErr.isAborted = true;
+                throw abortErr;
+            }
+            const reqCtrl = typeof AbortController !== "undefined" ? new AbortController() : null;
+            let didTimeout = false;
+            const onExtAbort = () => {
+                if (reqCtrl) reqCtrl.abort();
+            };
+            if (externalSignal && reqCtrl) {
+                externalSignal.addEventListener("abort", onExtAbort, { once: true });
+            }
+            const timeoutId = reqCtrl
+                ? setTimeout(() => {
+                      didTimeout = true;
+                      reqCtrl.abort();
+                  }, 45000)
+                : null;
+
             try {
                 const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${activeKey}`;
                 const response = await fetch(url, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
+                    signal: reqCtrl ? reqCtrl.signal : undefined,
                     body: JSON.stringify({
                         contents: [{ parts: parts }],
                         generationConfig: {
@@ -345,10 +419,24 @@ Output WAJIB JSON murni:
 
                 return parsed;
             } catch (err) {
-                lastError = err;
-                console.warn(`Model ${model} gagal atau sibuk:`, err.message);
+                if (externalSignal && externalSignal.aborted) {
+                    const abortErr = new Error("Analisis soal dibatalkan.");
+                    abortErr.isAborted = true;
+                    throw abortErr;
+                }
+                if (didTimeout) {
+                    lastError = new Error("Waktu permintaan ke server Gemini AI habis. Silakan coba lagi.");
+                } else {
+                    lastError = err;
+                }
+                console.warn(`Model ${model} gagal atau sibuk:`, lastError.message);
                 if (err.isQuotaLimit || err.status === 429) {
                     throw err;
+                }
+            } finally {
+                if (timeoutId) clearTimeout(timeoutId);
+                if (externalSignal && reqCtrl) {
+                    externalSignal.removeEventListener("abort", onExtAbort);
                 }
             }
         }
@@ -485,7 +573,10 @@ Output WAJIB JSON murni:
             splApi.setCurrentMethod(determinedMethod);
 
             splApi.clearMethodPills();
-            if (storyAppBtn) storyAppBtn.classList.add("active");
+            if (storyAppBtn) {
+                storyAppBtn.classList.add("active");
+                storyAppBtn.setAttribute("aria-checked", "true");
+            }
 
             splApi.renderSplInputs(dim, normalizedMat);
             displayAiStoryAnalysis(resultObj);
@@ -495,13 +586,18 @@ Output WAJIB JSON murni:
 
         if (storyAppBtn && storyProblemPanel) {
             storyAppBtn.addEventListener("click", () => {
+                if (storyAppBtn.classList.contains("active") && !storyProblemPanel.classList.contains("hidden")) {
+                    return;
+                }
                 if (splApi) {
                     splApi.clearMethodPills();
                     splApi.setCurrentMethod("story");
                     splApi.hideManualSections();
                     splApi.hideMessages();
                 }
+                if (aiStoryAnalysisCard) aiStoryAnalysisCard.classList.add("hidden");
                 storyAppBtn.classList.add("active");
+                storyAppBtn.setAttribute("aria-checked", "true");
                 storyProblemPanel.classList.remove("hidden");
                 if (storyQuotaCard) storyQuotaCard.classList.add("hidden");
             });
@@ -514,9 +610,30 @@ Output WAJIB JSON murni:
         let preparedImagePayload = null;
         let activeReaderHandle = null;
         let activeAnimatorHandle = null;
+        let activeAnalysisController = null;
+        let analysisSessionToken = 0;
         let isFileUploading = false;
         let isAiAnalyzing = false;
         const defaultParseBtnHtml = btnParseStory ? btnParseStory.innerHTML : "Ekstraksi Matriks & Selesaikan OBE";
+
+        function cancelOngoingAnalysis() {
+            analysisSessionToken += 1;
+            if (activeAnalysisController) {
+                try {
+                    activeAnalysisController.abort();
+                } catch (_) {}
+                activeAnalysisController = null;
+            }
+            if (isAiAnalyzing) {
+                isAiAnalyzing = false;
+                if (animator) animator.stopScan(false);
+                if (btnParseStory && !isFileUploading) {
+                    btnParseStory.disabled = false;
+                    btnParseStory.classList.remove("is-upload-waiting");
+                    btnParseStory.innerHTML = defaultParseBtnHtml;
+                }
+            }
+        }
 
         function setUploadWaitingState(waiting) {
             isFileUploading = waiting;
@@ -571,6 +688,7 @@ Output WAJIB JSON murni:
             }
 
             if (splApi) splApi.hideMessages();
+            cancelOngoingAnalysis();
             cancelOngoingUpload();
 
             selectedFileRef = file;
@@ -621,7 +739,7 @@ Output WAJIB JSON murni:
                     if (splApi) {
                         splApi.showSplError(`
               <div class="error-title">Gagal Memuat Gambar Soal</div>
-              <div class="error-desc">${err.message || "Berkas tidak dapat diproses."}</div>
+              <div class="error-desc">${escapeSafeHtml(err.message || "Berkas tidak dapat diproses.")}</div>
             `);
                     }
                 });
@@ -669,6 +787,7 @@ Output WAJIB JSON murni:
                 removeFileBtn.addEventListener("click", (e) => {
                     e.preventDefault();
                     e.stopPropagation();
+                    cancelOngoingAnalysis();
                     cancelOngoingUpload();
                     selectedFileRef = null;
                     preparedImagePayload = null;
@@ -732,6 +851,9 @@ Output WAJIB JSON murni:
                 const localMethod = !hasFile && textVal ? detectMethodFromStoryText(textVal) : null;
 
                 // 2. Panggil Gemini AI + Animasi Laser Scan
+                const sessionToken = ++analysisSessionToken;
+                const ctrl = typeof AbortController !== "undefined" ? new AbortController() : null;
+                activeAnalysisController = ctrl;
                 isAiAnalyzing = true;
                 btnParseStory.disabled = true;
                 btnParseStory.classList.remove("is-upload-waiting");
@@ -739,7 +861,15 @@ Output WAJIB JSON murni:
                 if (hasFile && animator) animator.startScan();
 
                 try {
-                    const aiResult = await analyzeStoryProblemWithGemini(textVal, file, localMethod, preparedImagePayload);
+                    const aiResult = await analyzeStoryProblemWithGemini(
+                        textVal,
+                        file,
+                        localMethod,
+                        preparedImagePayload,
+                        ctrl ? ctrl.signal : null
+                    );
+
+                    if (sessionToken !== analysisSessionToken) return;
 
                     if (!aiResult || !Array.isArray(aiResult.matrix) || aiResult.matrix.length === 0) {
                         throw new Error("Matriks hasil ekstraksi AI tidak valid.");
@@ -748,6 +878,12 @@ Output WAJIB JSON murni:
                     const normalizedMat = normalizeAiMatrix(aiResult.matrix);
                     if (!normalizedMat) {
                         throw new Error("Dimensi matriks hasil ekstraksi AI tidak valid.");
+                    }
+                    const isAllCoeffZero = normalizedMat.every((row) =>
+                        row.slice(0, normalizedMat.length).every((val) => val === 0)
+                    );
+                    if (isAllCoeffZero) {
+                        throw new Error("Model AI tidak dapat menemukan persamaan linear yang valid dari soal tersebut.");
                     }
                     aiResult.matrix = normalizedMat;
                     aiResult.equations = formatStandardEquationsFromMatrix(normalizedMat);
@@ -762,6 +898,7 @@ Output WAJIB JSON murni:
                         animator.animateAnalysisReveal(aiStoryAnalysisCard, document.getElementById("spl-result-area"));
                     }
                 } catch (err) {
+                    if (sessionToken !== analysisSessionToken || err.isAborted) return;
                     if (hasFile && animator) animator.stopScan(false);
                     console.error("Error analisis soal cerita:", err);
                     const isQuota =
@@ -782,17 +919,22 @@ Output WAJIB JSON murni:
                     } else if (splApi) {
                         splApi.showSplError(`
               <div class="error-title">Gagal Menganalisis Soal Cerita</div>
-              <div class="error-desc">${err.message}</div>
+              <div class="error-desc">${escapeSafeHtml(err.message || "Terjadi kesalahan saat menganalisis soal.")}</div>
             `);
                     }
                 } finally {
-                    isAiAnalyzing = false;
-                    if (isFileUploading) {
-                        setUploadWaitingState(true);
-                    } else {
-                        btnParseStory.disabled = false;
-                        btnParseStory.classList.remove("is-upload-waiting");
-                        btnParseStory.innerHTML = defaultParseBtnHtml;
+                    if (activeAnalysisController === ctrl) {
+                        activeAnalysisController = null;
+                    }
+                    if (sessionToken === analysisSessionToken) {
+                        isAiAnalyzing = false;
+                        if (isFileUploading) {
+                            setUploadWaitingState(true);
+                        } else {
+                            btnParseStory.disabled = false;
+                            btnParseStory.classList.remove("is-upload-waiting");
+                            btnParseStory.innerHTML = defaultParseBtnHtml;
+                        }
                     }
                 }
             });
@@ -803,6 +945,7 @@ Output WAJIB JSON murni:
                 splApi = api;
             },
             hideStoryUi: () => {
+                cancelOngoingAnalysis();
                 if (animator) animator.stopScan(false);
                 if (storyProblemPanel) storyProblemPanel.classList.add("hidden");
                 if (aiStoryAnalysisCard) aiStoryAnalysisCard.classList.add("hidden");
